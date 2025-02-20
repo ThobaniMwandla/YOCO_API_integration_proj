@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoco Payment</title>
+    <link rel='stylesheet' href='/static/payment.css'>
+    <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var yocoPublicKey = "{{ yoco_public_key }}"; 
+    </script>
+</head>
+<body>
+    <h1>Using The Yoco API</h1>
+    <div class="popup">
+        <h3>Popup Payment</h3>
+        <button id="popup-pay">Pay R50.00</button>
+        <p></p>
+    </div>
+    <!-- <div class="inline">
+        <h3>Inline Payment</h3>
+        <form id="inline-form">
+            <div id='yoco_inline'></div>
+            <button type='submit'>Pay R50.00</button>
+        </form>
+        <p></p>
+    </div> -->
+    <script src='/static/payment.js'></script>
+</body>
+</html>
