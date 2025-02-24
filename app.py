@@ -10,31 +10,42 @@ app = Flask(__name__)
 
 # Yoco API details
 YOCO_SECRET_KEY = os.getenv("YOCO_SECRET_KEY")
-YOCO_ENDPOINT = "https://online.yoco.com/v1/charges/"
+YOCO_PAYMENT_ENDPOINT = "https://online.yoco.com/v1/charges/"
+TRANSACTIONS_API_URL = "https://online.yoco.com/v1/transactions"
 
-@app.route("/")
-def payment_page():
-    """Render payment page"""
-    return render_template("payment.html", yoco_public_key=os.getenv("YOCO_PUBLIC_KEY"))
+def create_charge(amount, token):
+    headers = {
+        'X-Auth-Secret-Key': YOCO_SECRET_KEY,
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'amountInCents': amount,
+        'currency': 'ZAR',
+        'token': token
+    }
+    response = requests.post(YOCO_PAYMENT_ENDPOINT, headers=headers, json=data)
+    return response.json()
 
-@app.route("/pay", methods=["POST"])
-def process_payment():
-    """Handles Yoco payment request"""
-    data = request.get_json()
-    token = data.get("token")
+def fetch_transactions():
+    headers = {
+        'X-Auth-Secret-Key': YOCO_SECRET_KEY
+    }
+    response = requests.get(TRANSACTIONS_API_URL, headers=headers)
+    transactions = response.json().get('data', [])
+    return transactions
 
-    if not token:
-        return jsonify({"error": "Payment token is required"}), 400
+@app.route('/', methods=['GET', 'POST'])
+def payment():
+    if request.method == 'POST':
+        data = request.get_json()
+        print("Received data:", data)  # Log incoming JSON data
+        amount = int(data['amount']) * 100  # Correct variable name
+        token = data['token']
+        charge_response = create_charge(amount, token)
+        return jsonify(charge_response)
 
-    response = requests.post(
-        YOCO_ENDPOINT,
-        headers={"X-Auth-Secret-Key": YOCO_SECRET_KEY},
-        json={"token": token, "amountInCents": 5000, "currency": "ZAR"},
-    )
-    print("******************************************")
-    print(response.json())
-    print(response.status_code)
-    return jsonify(response.json()), response.status_code
+    transactions = fetch_transactions()
+    return render_template('payment.html', yoco_public_key=os.getenv("YOCO_PUBLIC_KEY"), transactions=transactions)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
