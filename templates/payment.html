@@ -3,29 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yoco Payment</title>
-    <link rel='stylesheet' href='/static/payment.css'>
+    <title>YOCO Payment System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='payment.css') }}">
     <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='payment.js') }}"></script>
     <script>
         var yocoPublicKey = "{{ yoco_public_key }}"; 
     </script>
 </head>
 <body>
-    <h1>Using The Yoco API</h1>
-    <div class="popup">
-        <h3>Popup Payment</h3>
-        <button id="popup-pay">Pay R50.00</button>
-        <p></p>
-    </div>
-    <!-- <div class="inline">
-        <h3>Inline Payment</h3>
-        <form id="inline-form">
-            <div id='yoco_inline'></div>
-            <button type='submit'>Pay R50.00</button>
+    <div class="container">
+        <h1>YOCO Payment System</h1>
+        <form id="payment-form">
+            <label for="amount">Amount to Pay (ZAR):</label>
+            <input type="number" id="amount" name="amount" required>
+            <button type="submit">Pay</button>
         </form>
-        <p></p>
-    </div> -->
-    <script src='/static/payment.js'></script>
+        <h2>Previous Transactions</h2>
+        <ul>
+            {% for transaction in transactions %}
+                <li>Transaction ID: {{ transaction['id'] }} - Amount: {{ transaction['amountInCents'] / 100 }} ZAR</li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>

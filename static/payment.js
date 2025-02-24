@@ -1,29 +1,45 @@
-const yocoSDK = new window.YocoSDK({ publicKey: yocoPublicKey });
+document.addEventListener('DOMContentLoaded', function() {
+    const yocoSDK = new window.YocoSDK({ publicKey: yocoPublicKey });
 
-// Popup Payment
-document.getElementById("popup-pay").addEventListener("click", function() {
-    yocoSDK.showPopup({
-        currency: 'ZAR',
-        amountInCents: 5000,
-        name: 'Etechsolutions Payment',
-        callback: function(response) {
-            if (response.error) {
-                alert(response.error.message);
-            } else {
-                processPayment(response.id);
+    var form = document.getElementById('payment-form');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var amountInput = document.getElementById('amount');
+        var amount = amountInput.value;
+        
+        yocoSDK.showPopup({
+            amountInCents: amount * 100,
+            currency: 'ZAR',
+            callback: function(result) {
+                if (result.error) {
+                    alert("Error creating token: " + result.error.message); // Error alert
+                } else {
+                    var token = result.id;
+                    fetch('/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            amount: amount,
+                            token: token
+                        })
+                    }).then(response => response.json())
+                      .then(data => {
+                          if (data.error) {
+                              alert("Payment failed: " + data.errorMessage); // Payment failed alert
+                          } else {
+                              alert("Payment successful!"); // Payment successful alert
+                              amountInput.value = ''; // Clear the input field
+                          }
+                      })
+                      .catch(error => {
+                          console.error(error);
+                          alert("Payment failed: An error occurred."); // Payment failed alert
+                      });
+                }
             }
-        }
+        });
     });
 });
 
-// Send token to Flask backend
-function processPayment(token) {
-    fetch('/pay', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token })
-    })
-    .then(response => response.json())
-    .then(data => alert(data.status || data.error))
-    .catch(error => alert("Error: " + error.message));
-}
