@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         yocoSDK.showPopup({
             amountInCents: amount * 100,
             currency: 'ZAR',
+            name: 'Etechsolutions Tuchshop Payment',
             callback: function(result) {
                 if (result.error) {
                     alert("Error creating token: " + result.error.message); // Error alert

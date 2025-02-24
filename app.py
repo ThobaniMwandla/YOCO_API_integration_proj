@@ -30,7 +30,7 @@ def fetch_transactions():
     headers = {
         'X-Auth-Secret-Key': YOCO_SECRET_KEY
     }
-    response = requests.get(TRANSACTIONS_API_URL, headers=headers)
+    response = requests.get(YOCO_PAYMENT_ENDPOINT, headers=headers)
     transactions = response.json().get('data', [])
     return transactions
 
